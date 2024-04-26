@@ -20,6 +20,11 @@ products_fields = {
     'name' : fields.String
 }
 
+users_fields = {
+    'id' : fields.Integer,
+    'username' : fields.String
+}
+
 from .models import Products_Database
 from . import routes
 
@@ -28,3 +33,5 @@ with app.app_context():
 
 api.add_resource(routes.Products, "/products")
 api.add_resource(routes.Product, "/product/<int:id>")
+api.add_resource(routes.Registration, "/signup")
+api.add_resource(routes.Users, "/users")

@@ -1,7 +1,9 @@
+from flask import request
+from flask_bcrypt import generate_password_hash
 from flask_restful import Resource, marshal_with
-from .models import Products_Database
-from . import products_post_args, db, products_fields
-from forms import RegistrationForm
+from .models import Products_Database, Users_Database
+from . import products_post_args, db, products_fields, users_fields
+from .forms import RegistrationForm
 class Products(Resource):
     @marshal_with(products_fields)
     def get(self):
@@ -22,7 +24,6 @@ class Product(Resource):
         product = Products_Database.query.get_or_404(id)
         return product
 
-    @marshal_with(products_fields)
     def delete(self, id):
         product_to_delete = Products_Database.query.get_or_404(id)
         db.session.delete(product_to_delete)
@@ -32,14 +33,27 @@ class Product(Resource):
 class Registration(Resource):
     def get(self):
         return {'message' : 'This is registration page'}, 200
+
     def post(self):
-        reg_form = RegistrationForm()
+        reg_form = RegistrationForm(data=request.get_json())
+
         if reg_form.validate():
-            username = reg_form.username.data()
-            password = reg_form.password.data()
-            confirm = reg_form.confirm.data()
+            username = reg_form.username.data
+            password = reg_form.password.data
 
-            #hashed_password = #TODO
+            hashed_password = generate_password_hash(password).decode("utf-8")
+            new_user = Users_Database(username=username, password=hashed_password)
 
-            #db.session.add(new_user()) #TODO
-        return 200
+            db.session.add(new_user)
+            db.session.commit()
+        else:
+            return {'message': f'Failed to create a user'}, 400
+
+        return {'message': f'User {username} is successfully created'}, 200
+
+
+class Users(Resource):
+    @marshal_with(users_fields)
+    def get(self):
+        users = Users_Database.query.all()
+        return users, 200
