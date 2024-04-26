@@ -1,9 +1,10 @@
 from flask import request
-from flask_bcrypt import generate_password_hash
+from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_restful import Resource, marshal_with
 from .models import Products_Database, Users_Database
 from . import products_post_args, db, products_fields, users_fields
-from .forms import RegistrationForm
+from .forms import RegistrationForm, LoginForm
+from flask_login import login_user
 class Products(Resource):
     @marshal_with(products_fields)
     def get(self):
@@ -28,11 +29,11 @@ class Product(Resource):
         product_to_delete = Products_Database.query.get_or_404(id)
         db.session.delete(product_to_delete)
         db.session.commit()
-        return {'message' : f'Successfully deleted product with id {id}'}, 200
+        return {'message' : f'Successfully deleted product with id {id}.'}, 200
 
-class Registration(Resource):
+class Signup(Resource):
     def get(self):
-        return {'message' : 'This is registration page'}, 200
+        return {'message' : 'This is registration page.'}, 200
 
     def post(self):
         reg_form = RegistrationForm(data=request.get_json())
@@ -47,10 +48,34 @@ class Registration(Resource):
             db.session.add(new_user)
             db.session.commit()
         else:
-            return {'message': f'Failed to create a user'}, 400
+            return {'message': f'Failed to create a user.'}, 400
 
-        return {'message': f'User {username} is successfully created'}, 200
+        return {'message': f'User {username} is successfully created.'}, 200
 
+class Login(Resource):
+    def get(self):
+        return {'message' : 'This is a login page.'}, 200
+
+    def post(self):
+        login_form = LoginForm(data=request.get_json())
+
+        if login_form.validate():
+            username = login_form.username.data
+            password = login_form.password.data
+
+            user = Users_Database.query.filter_by(username=username).first()
+
+            if user:
+                if check_password_hash(user.password, password):
+                    login_user(user)
+                else:
+                    return {'message': f'Failed to login. Incorrect password.'}, 400
+            else:
+                return {'message': f'Failed to login. No user found.'}, 400
+        else:
+            return {'message': f'Failed to login.'}, 400
+
+        return {'message': f'User {username} is successfully logged in.'}, 200
 
 class Users(Resource):
     @marshal_with(users_fields)

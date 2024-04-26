@@ -6,15 +6,30 @@ response = requests.get(BASE + "signup")
 print(response.json(), response.status_code)
 
 data = {
-    "username": "test1",
+    "username": "test2",
     "password": "12345",
     "confirm": "12345"
 }
+
+response = requests.get(BASE + "signup")
+print(response.json(), response.status_code)
 
 response = requests.post(BASE + "signup", json=data)
 print(response.json(), response.status_code)
 
 response = requests.get(BASE + "signup")
+print(response.json(), response.status_code)
+
+response = requests.get(BASE + "users")
+print(response.json(), response.status_code)
+
+response = requests.get(BASE + "login")
+print(response.json(), response.status_code)
+
+response = requests.post(BASE + "login", json=data)
+print(response.json(), response.status_code)
+
+response = requests.get(BASE + "login")
 print(response.json(), response.status_code)
 
 response = requests.get(BASE + "users")
