@@ -2,16 +2,19 @@ from flask import request
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_restful import Resource, marshal_with
 from .models import Products_Database, Users_Database
-from . import products_post_args, db, products_fields, users_fields
+from . import products_post_args, db, products_fields, users_fields, app
 from .forms import RegistrationForm, LoginForm
-from flask_login import login_user
+from flask_login import login_user, login_required
+from datetime import timedelta
 class Products(Resource):
     @marshal_with(products_fields)
+    @login_required
     def get(self):
         products = Products_Database.query.all()
         return products
 
     @marshal_with(products_fields)
+    @login_required
     def post(self):
         data = products_post_args.parse_args()
         new_product = Products_Database(name=data['name'])
@@ -21,10 +24,12 @@ class Products(Resource):
 
 class Product(Resource):
     @marshal_with(products_fields)
+    @login_required
     def get(self, id):
         product = Products_Database.query.get_or_404(id)
         return product
 
+    @login_required
     def delete(self, id):
         product_to_delete = Products_Database.query.get_or_404(id)
         db.session.delete(product_to_delete)
@@ -68,6 +73,7 @@ class Login(Resource):
             if user:
                 if check_password_hash(user.password, password):
                     login_user(user)
+                    app.permanent_session_lifetime = timedelta(minutes=1)
                 else:
                     return {'message': f'Failed to login. Incorrect password.'}, 400
             else:

@@ -15,6 +15,7 @@ db = SQLAlchemy(app)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
+login_manager.login_view = "login"
 
 products_post_args = reqparse.RequestParser()
 products_post_args.add_argument("name", type=str, help="Name of a product")
@@ -37,10 +38,18 @@ with app.app_context():
 
 @login_manager.user_loader
 def load_user(user_id):
-    return Users_Database(user_id)
+    return Users_Database.query.get(int(user_id))
 
 api.add_resource(routes.Products, "/products")
 api.add_resource(routes.Product, "/product/<int:id>")
 api.add_resource(routes.Signup, "/signup")
 api.add_resource(routes.Login, "/login")
 api.add_resource(routes.Users, "/users")
+
+
+# testing /products endpoint for logged in users
+
+#with app.app_context():
+#    user = Users_Database.query.get(3)
+#    with app.test_client(user) as client:
+#        print(client.get('/products'))
