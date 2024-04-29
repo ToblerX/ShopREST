@@ -55,7 +55,7 @@ class Signup(Resource):
         else:
             return {'message': f'Failed to create a user.'}, 400
 
-        return {'message': f'User {username} is successfully created.'}, 200
+        return {'message': f'User {username} is successfully created.'}, 201
 
 class Login(Resource):
     def get(self):
