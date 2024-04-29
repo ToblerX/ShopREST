@@ -2,6 +2,8 @@ from flask import Flask
 from flask_restful import Api, reqparse, fields
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+from .utils import TestClientLogin
+from .test import BASE
 
 app = Flask(__name__)
 app.secret_key = 'SECRETKEY'
@@ -30,6 +32,8 @@ users_fields = {
     'username' : fields.String
 }
 
+test_client = TestClientLogin(app, 'test3', '12345')
+
 from .models import Products_Database, Users_Database
 from . import routes
 
@@ -49,7 +53,9 @@ api.add_resource(routes.Users, "/users")
 
 # testing /products endpoint for logged in users
 
-#with app.app_context():
-#    user = Users_Database.query.get(3)
-#    with app.test_client(user) as client:
-#        print(client.get('/products'))
+#data = {
+#    "name": "table",
+#}
+
+#test_client.test_get_request(BASE + 'products', Users_Database, 3)
+#test_client.test_post_request(BASE + 'products', Users_Database, 3, data)
