@@ -5,6 +5,7 @@ class Products_Database(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), nullable=False)
+    price = db.Column(db.Integer, nullable=False)
 
 class Users_Database(db.Model, UserMixin):
     __tablename__ = 'users'

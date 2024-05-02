@@ -21,10 +21,12 @@ login_manager.login_view = "login"
 
 products_post_args = reqparse.RequestParser()
 products_post_args.add_argument("name", type=str, help="Name of a product")
+products_post_args.add_argument("price", type=str, help="Price of a product")
 
 products_fields = {
     'id' : fields.Integer,
-    'name' : fields.String
+    'name' : fields.String,
+    'price' : fields.Integer
 }
 
 users_fields = {
@@ -49,12 +51,14 @@ api.add_resource(routes.Product, "/product/<int:id>")
 api.add_resource(routes.Signup, "/signup")
 api.add_resource(routes.Login, "/login")
 api.add_resource(routes.Users, "/users")
+api.add_resource(routes.Buy, "/buy/<int:id>")
 
 
 # testing /products endpoint for logged in users
 
 #data = {
 #    "name": "table",
+#    "price": 100
 #}
 
 #test_client.test_get_request(BASE + 'products', Users_Database, 3)

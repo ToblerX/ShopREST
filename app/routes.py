@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, redirect
 from flask_bcrypt import generate_password_hash, check_password_hash
 from flask_restful import Resource, marshal_with
 from .models import Products_Database, Users_Database
@@ -6,6 +6,7 @@ from . import products_post_args, db, products_fields, users_fields, app
 from .forms import RegistrationForm, LoginForm
 from flask_login import login_user, login_required
 from datetime import timedelta
+from cloudipsp import Api, Checkout
 class Products(Resource):
     @marshal_with(products_fields)
     @login_required
@@ -17,7 +18,7 @@ class Products(Resource):
     @login_required
     def post(self):
         data = products_post_args.parse_args()
-        new_product = Products_Database(name=data['name'])
+        new_product = Products_Database(name=data['name'], price=data['price'])
         db.session.add(new_product)
         db.session.commit()
         return new_product, 201
@@ -88,3 +89,17 @@ class Users(Resource):
     def get(self):
         users = Users_Database.query.all()
         return users, 200
+
+
+class Buy(Resource):
+    def get(self, id):
+        product = Products_Database.query.get(id)
+        api = Api(merchant_id=1396424,
+                  secret_key='test')
+        checkout = Checkout(api=api)
+        data = {
+            "currency": "USD",
+            "amount": product.price
+        }
+        url = checkout.url(data).get('checkout_url')
+        return redirect(url)
