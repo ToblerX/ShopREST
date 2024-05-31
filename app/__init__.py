@@ -24,17 +24,15 @@ products_post_args.add_argument("name", type=str, help="Name of a product")
 products_post_args.add_argument("price", type=str, help="Price of a product")
 
 products_fields = {
-    'id' : fields.Integer,
-    'name' : fields.String,
-    'price' : fields.Integer
+    'id': fields.Integer,
+    'name': fields.String,
+    'price': fields.Integer
 }
 
 users_fields = {
-    'id' : fields.Integer,
-    'username' : fields.String
+    'id': fields.Integer,
+    'username': fields.String
 }
-
-test_client = TestClientLogin(app, 'test3', '12345')
 
 from .models import Products_Database, Users_Database
 from . import routes
@@ -54,6 +52,7 @@ api.add_resource(routes.Users, "/users")
 api.add_resource(routes.Buy, "/buy/<int:id>")
 
 
+#test_client = TestClientLogin(app, 'test3', '12345')
 # testing /products endpoint for logged in users
 
 #data = {
